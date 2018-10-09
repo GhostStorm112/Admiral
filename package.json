@@ -1,20 +1,21 @@
 {
-  "name": "admiral",
-  "version": "0.0.1",
-  "description": "Microservice discovery and registery",
-  "main": "index.js",
-  "scripts": {
-    "test": "eslint ."
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://gitlab.com/GhostStorm/Admiral.git"
-  },
-  "author": "_112",
-  "license": "MIT",
-  "dependencies": {
+	"name": "admiral",
+	"version": "0.0.1",
+	"description": "Microservice discovery and registery",
+	"main": "index.js",
+	"scripts": {
+		"test": "eslint ."
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://gitlab.com/GhostStorm/Admiral.git"
+	},
+	"author": "_112",
+	"license": "MIT",
+	"dependencies": {
 		"ghost-core": "https://gitlab.com/GhostStorm/Core.git",
-		"express": "^4.16.3"
+		"express": "^4.16.3",
+		"body-parser": "^1.18.3"
 	},
 	"devDependencies": {
 		"dotenv": "^6.0.0",
