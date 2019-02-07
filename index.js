@@ -1,32 +1,85 @@
+const WebSocket = require('ws')
 const GhostCore = require('ghost-core')
 const log = new GhostCore.Logger()
-const bodyParser = require('body-parser')
-const express = require('express')
-const config = require('./config.json')
+const shardAmount = 20
+let shardList = [...Array(shardAmount).keys()]
+let gatewayAmount = 10
+let Clients = []
+const wss = new WebSocket.Server({
+  port: 9911
+})
 
-let registery = []
-let app = express()
+function noop () {}
 
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({extended: true}))
+function heartbeat () {
+  this.isAlive = true
+}
 
+async function run () {
+  wss.getUniqueID = function () {
+    function s4 () {
+      return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1)
+    }
+    return s4() + s4() + '-' + s4()
+  }
+  wss.on('connection', function connection (ws) {
+    ws.id = wss.getUniqueID()
+    log.info('Webscoket', 'Client connected')
+    ws.isAlive = true
+    ws.on('pong', heartbeat)
+    _registerListeners(ws)
+  })
 
-app.use('/register/:type/:id', function(req, res, next) {
-    log.info('Register', `${req.params.type} reg with id ${req.params.id}`)
-    next()
-}, function (req, res, next) {
-    registery.push({
-        type: req.params.id,
-        id: req.params.id
+  const interval = setInterval(function ping () {
+    wss.clients.forEach(function each (ws) {
+      if (ws.isAlive === false) {
+        return ws.terminate()
+      }
+      ws.isAlive = false
+      ws.ping(noop)
     })
-    console.log(registery)
-})
+  }, 5000)
+}
 
-app.get('/registery/', function (req, res, next) {
-        res.send(registery)
-})
+function _registerListeners (ws) {
+  ws.on('message', function incoming (message) {
+    const packet = JSON.parse(message)
+    if (packet.op === 'request-shards') {
+      shardRequest(ws, packet)
+    }
+  })
+  ws.on('close', () => {
+    log.info('ShardRequest', `Shards ${Clients[ws.id]} being added back to bucket`)
+    shardList = Clients[ws.id].concat(shardList)
+    Clients.splice(ws.id, ws.id)
+    shardList.sort((a, b) => a - b)
+  })
+}
 
-app.listen(config.port, config.host)
+async function shardRequest (ws, packet) {
+  if (Clients[ws.id]) {
+    ws.send(JSON.stringify({
+      op: 'shard-ids',
+      d: {
+        shards: Clients[ws.id]
+      }
+    }))
+    log.info('ShardRequest', `Shards ${Clients[ws.id]} being sent to ${packet.d.resumeID}`)
+  } else {
+    let gatewayShards = []
+    gatewayShards = shardList.splice(0, gatewayAmount)
+    ws.send(JSON.stringify({
+      op: 'shard-ids',
+      d: {
+        shardAmount: shardAmount,
+        shards: gatewayShards
+      }
+    }))
+    log.info('ShardRequest', `Shards ${gatewayShards} being sent to ${packet.d.resumeID}`)
+    Clients[ws.id] = gatewayShards
+    gatewayShards = null
+  }
+}
 
-
-log.info('Admiral', `Server started ${config.host}:${config.port}`)
+run().catch(error => log.error('Admiral', error))
+log.info('Admiral', 'Started')

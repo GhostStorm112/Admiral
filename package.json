@@ -15,7 +15,8 @@
 	"dependencies": {
 		"body-parser": "^1.18.3",
 		"express": "^4.16.4",
-		"ghost-core": "https://gitlab.com/GhostStorm/Core.git"
+		"ghost-core": "https://gitlab.com/GhostStorm/Core.git",
+		"ws": "^6.1.3"
 	},
 	"devDependencies": {
 		"dotenv": "^6.0.0",
