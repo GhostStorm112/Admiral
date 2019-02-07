@@ -9,12 +9,6 @@ const wss = new WebSocket.Server({
   port: 9911
 })
 
-function noop () {}
-
-function heartbeat () {
-  this.isAlive = true
-}
-
 async function run () {
   wss.getUniqueID = function () {
     function s4 () {
@@ -79,6 +73,12 @@ async function shardRequest (ws, packet) {
     Clients[ws.id] = gatewayShards
     gatewayShards = null
   }
+}
+
+function noop () {}
+
+function heartbeat () {
+  this.isAlive = true
 }
 
 run().catch(error => log.error('Admiral', error))
