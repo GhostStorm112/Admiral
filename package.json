@@ -13,19 +13,19 @@
 	"author": "_112",
 	"license": "MIT",
 	"dependencies": {
-		"body-parser": "^1.18.3",
-		"express": "^4.16.4",
+		"body-parser": "^1.19.0",
+		"express": "^4.17.1",
 		"ghost-core": "https://gitlab.com/GhostStorm/Core.git",
-		"ws": "^6.1.3"
+		"ws": "^7.2.0"
 	},
 	"devDependencies": {
-		"dotenv": "^6.0.0",
-		"eslint": "^5.7.0",
-		"eslint-config-standard": "^12.0.0",
-		"eslint-plugin-import": "^2.8.0",
-		"eslint-plugin-node": "^7.0.1",
-		"eslint-plugin-promise": "^4.0.1",
-		"eslint-plugin-standard": "^4.0.0"
+		"dotenv": "^8.2.0",
+		"eslint": "~6.6.0",
+		"eslint-config-standard": "^14.1.0",
+		"eslint-plugin-import": "^2.18.2",
+		"eslint-plugin-node": "^10.0.0",
+		"eslint-plugin-promise": "^4.2.1",
+		"eslint-plugin-standard": "^4.0.1"
 	},
 	"eslintConfig": {
 		"extends": "standard",
